@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Sun City West Air Quality</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b1b2b;
+      color: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .container {
+      text-align: center;
+    }
+    .city {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .aqi {
+      font-size: 5rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    .status {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .updated {
+      font-size: 1rem;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="city">Sun City West Air Quality</div>
+    <div class="aqi" id="aqi">--</div>
+    <div class="status" id="status">Loading...</div>
+    <div class="updated" id="updated"></div>
+  </div>
+
+  <script>
+    const API_KEY = 'YOUR_API_KEY_HERE';
+    const LAT = 33.661;
+    const LON = -112.341;
+
+    function aqiDescription(aqi) {
+      switch (aqi) {
+        case 1: return 'Good';
+        case 2: return 'Fair';
+        case 3: return 'Moderate';
+        case 4: return 'Poor';
+        case 5: return 'Very Poor';
+        default: return 'Unknown';
+      }
+    }
+
+    async function fetchAQI() {
+      try {
+        const url = `https://api.openweathermap.org/data/2.5/air_pollution?lat=${LAT}&lon=${LON}&appid=${API_KEY}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        const aqi = data.list[0].main.aqi;
+
+        document.getElementById('aqi').textContent = aqi;
+        document.getElementById('status').textContent = aqiDescription(aqi);
+        document.getElementById('updated').textContent =
+          'Updated: ' + new Date().toLocaleTimeString();
+      } catch (e) {
+        document.getElementById('status').textContent = 'Error loading data';
+      }
+    }
+
+    fetchAQI();
+    setInterval(fetchAQI, 10 * 60 * 1000); // refresh every 10 minutes
+  </script>
+</body>
+</html>
